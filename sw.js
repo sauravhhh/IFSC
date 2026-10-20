@@ -1,4 +1,4 @@
-const CACHE = 'ifsc-v7';
+const CACHE = 'ifsc-v8';
 const SHELL = ['./', './index.html', './manifest.json', './icon.svg', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
