@@ -56,7 +56,10 @@
   .x:active{opacity:.7;}
   .row{display:flex;justify-content:space-between;gap:14px;padding:10px 0;
     border-top:1px solid var(--sep);font-size:14px;}
-  .row .k{color:var(--mut);flex-shrink:0;}
+  .row .k{color:var(--mut);flex-shrink:0;display:flex;align-items:center;gap:7px;}
+  .row .k svg{width:15px;height:15px;flex-shrink:0;}
+  .btn svg, .actions button svg{width:16px;height:16px;vertical-align:-3px;margin-right:6px;}
+  .field .searchIc{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--mut);pointer-events:none;}
   .row .v{text-align:right;font-weight:500;word-break:break-word;}
   .actions{display:flex;gap:10px;margin-top:16px;}
   .actions button{flex:1;padding:13px;font-size:14px;font-weight:600;border-radius:12px;cursor:pointer;
@@ -87,12 +90,13 @@
   </header>
 
   <div class="field">
+    <svg class="searchIc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
     <input id="q" maxlength="11" placeholder="Enter IFSC code, e.g. SBIN0000001"
       autocomplete="off" autocapitalize="characters" spellcheck="false">
     <button class="clearIn" id="clearInput" aria-label="Clear">✕</button>
     <div class="hint">11 characters · 4 letters, then 0, then 6 numbers/letters</div>
   </div>
-  <button class="btn" id="go">Search</button>
+  <button class="btn" id="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>Search</button>
 
   <div id="out"></div>
 
@@ -128,9 +132,18 @@ function renderRecent(){
   });
 }
 
-function row(k, v){
+const IC = {
+  code:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="8 6 3 12 8 18"/><polyline points="16 6 21 12 16 18"/></svg>',
+  micr:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="4" y2="18"/><line x1="8" y1="6" x2="8" y2="18"/><line x1="13" y1="6" x2="13" y2="18"/><line x1="16" y1="6" x2="16" y2="18"/><line x1="20" y1="6" x2="20" y2="18"/></svg>',
+  branch:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V8l7-5 7 5v13"/><line x1="10" y1="21" x2="10" y2="15"/><line x1="14" y1="21" x2="14" y2="15"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+  phone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.13.96.36 1.9.7 2.8a2 2 0 0 1-.45 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.45c.9.34 1.84.57 2.8.7A2 2 0 0 1 22 16.9z"/></svg>',
+  copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+  share:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>'
+};
+function row(k, v, ic){
   if(v == null || v === '') return '';
-  return '<div class="row"><span class="k">'+k+'</span><span class="v">'+esc(v)+'</span></div>';
+  return '<div class="row"><span class="k">'+(ic||'')+k+'</span><span class="v">'+esc(v)+'</span></div>';
 }
 
 async function search(){
@@ -160,17 +173,17 @@ async function search(){
         '<button class="x" id="closeCard" aria-label="Close">✕</button>' +
         '<h2>'+esc(d.BANK||'')+'</h2>' +
         '<p class="sub">'+esc(d.BRANCH||'')+'</p>' +
-        row('IFSC', d.IFSC) +
-        row('MICR', d.MICR) +
-        row('Branch code', d.BRANCHCODE) +
-        row('City', d.CITY) +
-        row('District', d.DISTRICT) +
-        row('State', d.STATE) +
-        row('Address', d.ADDRESS) +
-        row('Contact', d.CONTACT) +
+        row('IFSC', d.IFSC, IC.code) +
+        row('MICR', d.MICR, IC.micr) +
+        row('Branch code', d.BRANCHCODE, IC.branch) +
+        row('City', d.CITY, IC.pin) +
+        row('District', d.DISTRICT, IC.pin) +
+        row('State', d.STATE, IC.pin) +
+        row('Address', d.ADDRESS, IC.pin) +
+        row('Contact', d.CONTACT, IC.phone) +
         '<div class="actions">' +
-          '<button id="copyBtn">Copy details</button>' +
-          '<button id="shareBtn" class="share">Share</button>' +
+          '<button id="copyBtn">'+IC.copy+'Copy details</button>' +
+          '<button id="shareBtn" class="share">'+IC.share+'Share</button>' +
         '</div>' +
       '</div>';
     $('closeCard').addEventListener('click', ()=>{
@@ -182,12 +195,12 @@ async function search(){
     $('copyBtn').addEventListener('click', async ()=>{
       try{ await navigator.clipboard.writeText(lastText); $('copyBtn').textContent = 'Copied ✓'; }
       catch(e){ $('copyBtn').textContent = 'Copy failed'; }
-      setTimeout(()=>{ const b=$('copyBtn'); if(b) b.textContent='Copy details'; }, 1500);
+      setTimeout(()=>{ const b=$('copyBtn'); if(b) b.innerHTML=IC.copy+'Copy details'; }, 1500);
     });
     $('shareBtn').addEventListener('click', async ()=>{
       if(navigator.share){ try{ await navigator.share({title:'IFSC details', text:lastText}); }catch(e){} }
       else{ try{ await navigator.clipboard.writeText(lastText); $('shareBtn').textContent='Copied ✓'; }catch(e){} 
-        setTimeout(()=>{ const b=$('shareBtn'); if(b) b.textContent='Share'; }, 1500); }
+        setTimeout(()=>{ const b=$('shareBtn'); if(b) b.innerHTML=IC.share+'Share'; }, 1500); }
     });
     pushRecent(code);
   }catch(e){
