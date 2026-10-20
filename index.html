@@ -28,10 +28,16 @@
   header img{width:72px;height:72px;border-radius:18px;}
   header h1{font-size:26px;margin:12px 0 4px;font-weight:700;letter-spacing:-.4px;}
   header p{margin:0;color:var(--mut);font-size:14px;}
-  .field{margin:22px 0 0;}
-  .field input{width:100%;padding:15px 16px;font-size:18px;font-weight:600;letter-spacing:1.5px;
+  .field{margin:22px 0 0;position:relative;}
+  .field input{width:100%;padding:15px 48px 15px 16px;font-size:18px;font-weight:600;letter-spacing:1.5px;
     text-transform:uppercase;border:1px solid var(--sep);border-radius:14px;
     background:var(--card);color:var(--txt);outline:none;text-align:center;}
+  .clearIn{position:absolute;right:10px;top:50%;transform:translateY(-50%) scale(.6);width:28px;height:28px;
+    border-radius:50%;border:none;background:var(--inp);color:var(--mut);font-size:13px;line-height:1;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;transition:opacity .18s ease,transform .18s ease;}
+  .clearIn.on{opacity:1;pointer-events:auto;transform:translateY(-50%) scale(1);}
+  .clearIn:active{opacity:.7;}
   .field input:focus{border-color:var(--acc);}
   .field input::placeholder{color:var(--mut);font-weight:400;letter-spacing:.3px;text-transform:none;}
   .hint{text-align:center;color:var(--mut);font-size:12px;margin-top:8px;}
@@ -83,6 +89,7 @@
   <div class="field">
     <input id="q" maxlength="11" placeholder="Enter IFSC code, e.g. SBIN0000001"
       autocomplete="off" autocapitalize="characters" spellcheck="false">
+    <button class="clearIn" id="clearInput" aria-label="Clear">✕</button>
     <div class="hint">11 characters · 4 letters, then 0, then 6 numbers/letters</div>
   </div>
   <button class="btn" id="go">Search</button>
@@ -170,7 +177,7 @@ async function search(){
       const card = $('resultCard');
       if(!card) return;
       card.classList.add('out');
-      setTimeout(()=>{ $('out').innerHTML=''; $('q').value=''; $('q').focus(); }, 260);
+      setTimeout(()=>{ $('out').innerHTML=''; $('q').value=''; $('clearInput').classList.remove('on'); $('q').focus(); }, 260);
     });
     $('copyBtn').addEventListener('click', async ()=>{
       try{ await navigator.clipboard.writeText(lastText); $('copyBtn').textContent = 'Copied ✓'; }
@@ -192,7 +199,17 @@ async function search(){
 
 $('go').addEventListener('click', search);
 $('q').addEventListener('keyup', e=>{ if(e.key === 'Enter') search(); });
-$('q').addEventListener('input', ()=>{ $('q').value = $('q').value.toUpperCase().replace(/[^A-Z0-9]/g,''); });
+$('q').addEventListener('input', ()=>{
+  $('q').value = $('q').value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+  $('clearInput').classList.toggle('on', $('q').value.length > 0);
+});
+$('clearInput').addEventListener('click', ()=>{
+  $('q').value = '';
+  $('clearInput').classList.remove('on');
+  const card = $('resultCard');
+  if(card){ card.classList.add('out'); setTimeout(()=>{ $('out').innerHTML=''; }, 260); }
+  $('q').focus();
+});
 renderRecent();
 if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('sw.js'); }catch(e){} }
 </script>
