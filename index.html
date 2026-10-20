@@ -50,6 +50,12 @@
   .card.out{opacity:0;transform:translateY(10px) scale(.98);transition:opacity .25s ease,transform .25s ease;}
   .card h2{margin:0 26px 2px 0;font-size:20px;letter-spacing:-.3px;font-weight:700;}
   .card .sub{color:var(--mut);font-size:13px;margin:0 0 8px;}
+  .bankhead{display:flex;gap:13px;align-items:center;margin-bottom:6px;padding-right:26px;}
+  .logoWrap{position:relative;width:48px;height:48px;flex-shrink:0;}
+  .logoTile{position:absolute;inset:0;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:700;font-size:15px;letter-spacing:.5px;}
+  .logoImg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff;
+    border:1px solid var(--sep);border-radius:12px;padding:5px;}
   .x{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;border:none;
     background:var(--inp);color:var(--mut);font-size:15px;line-height:1;cursor:pointer;
     display:flex;align-items:center;justify-content:center;}
@@ -132,6 +138,40 @@ function renderRecent(){
   });
 }
 
+/* bank prefix (first 4 of IFSC) -> [website domain for logo, brand colour, short initials] */
+const BANKS = {
+  /* PSU banks */
+  SBIN:['sbi.co.in','#22409a','SBI'], PUNB:['pnbindia.in','#a20e37','PNB'], BARB:['bankofbaroda.in','#f26522','BoB'],
+  CNRB:['canarabank.com','#00a3e0','CAN'], UBIN:['unionbankofindia.co.in','#005baa','UBI'], BKID:['bankofindia.co.in','#f58220','BoI'],
+  IDIB:['indianbank.in','#00539f','IB'], CBIN:['centralbankofindia.co.in','#005ca9','CBI'], IOBA:['iob.in','#00539f','IOB'],
+  UCBA:['ucobank.com','#00539f','UCO'], MAHB:['bankofmaharashtra.in','#00539f','BoM'], PSIB:['psbindia.com','#00539f','PSB'],
+  /* private banks */
+  HDFC:['hdfcbank.com','#00428c','HDFC'], ICIC:['icicibank.com','#b02a30','ICICI'], UTIB:['axisbank.com','#97144d','AXIS'],
+  KKBK:['kotak.com','#ed232a','KOTAK'], INDB:['indusind.com','#832625','INDUS'], YESB:['yesbank.in','#00518f','YES'],
+  FDRL:['federalbank.co.in','#00539f','FED'], IDFB:['idfcfirstbank.com','#9d1d27','IDFC'], BDBL:['bandhanbank.com','#00539f','BND'],
+  RATN:['rblbank.com','#2e3192','RBL'], SIBL:['southindianbank.com','#00539f','SIB'], KVBL:['kvb.co.in','#00539f','KVB'],
+  TMBL:['tmb.in','#00539f','TMB'], CIUB:['cityunionbank.com','#00539f','CUB'], DCBL:['dcbbank.com','#00539f','DCB'],
+  JAKA:['jkb.bank.in','#00539f','JKB'], SRCB:['saraswatbank.com','#00539f','SAR'], CSBK:['csb.co.in','#00539f','CSB'],
+  DLXB:['dhanlaxmi.bank.in','#00539f','DLB'], ESFB:['equitasbank.com','#00539f','EQ'],
+  /* small finance banks */
+  AUBL:['aubank.in','#00539f','AU'], UJVN:['ujjivansfb.in','#00539f','UJJ'], JANA:['janabank.com','#00539f','JANA'],
+  ESAF:['esafbank.com','#00539f','ESAF'], SURY:['suryodaybank.com','#f58220','SUR'], UTKS:['utkarsh.bank','#00539f','UTK'],
+  CAPS:['capitalbank.co.in','#00539f','CAP'], NESF:['nesfb.com','#00539f','NE'], SHRO:['shivalikbank.com','#00539f','SHV'],
+  /* payment banks */
+  IPOS:['ippbonline.com','#b02a30','IPPB'], PYTM:['paytmbank.com','#00b9f1','PYTM'], AIRP:['airtel.in','#ed232a','AIR'],
+  FINO:['finobank.com','#00539f','FINO'], JIOP:['jio.com','#00539f','JIO'], NSPB:['nsdlbank.com','#00539f','NSDL'],
+  /* foreign / others */
+  HSBC:['hsbc.co.in','#db0011','HSBC'], SCBL:['sc.com','#00539f','SC'], CITI:['citibank.co.in','#2557d6','CITI'],
+  DEUT:['db.com','#0018a8','DB'], DBSS:['dbs.com','#e31837','DBS'], BARC:['barclays.in','#00aeeF','BAR']
+};
+function bankLogo(code, bankName){
+  const p = (code||'').slice(0,4).toUpperCase();
+  const b = BANKS[p];
+  const initials = b ? b[2] : (bankName||'?').split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  const color = b ? b[1] : '#111111';
+  const img = b ? '<img class="logoImg" id="logoImg" data-d="'+b[0]+'" alt="" src="https://icons.duckduckgo.com/ip3/'+b[0]+'.ico">' : '';
+  return '<div class="logoWrap"><div class="logoTile" style="background:'+color+'">'+esc(initials)+'</div>'+img+'</div>';
+}
 const IC = {
   code:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="8 6 3 12 8 18"/><polyline points="16 6 21 12 16 18"/></svg>',
   micr:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="4" y2="18"/><line x1="8" y1="6" x2="8" y2="18"/><line x1="13" y1="6" x2="13" y2="18"/><line x1="16" y1="6" x2="16" y2="18"/><line x1="20" y1="6" x2="20" y2="18"/></svg>',
@@ -171,8 +211,10 @@ async function search(){
     $('out').innerHTML =
       '<div class="card" id="resultCard">' +
         '<button class="x" id="closeCard" aria-label="Close">✕</button>' +
-        '<h2>'+esc(d.BANK||'')+'</h2>' +
-        '<p class="sub">'+esc(d.BRANCH||'')+'</p>' +
+        '<div class="bankhead">' + bankLogo(d.IFSC, d.BANK) +
+          '<div><h2 style="margin:0 0 2px">'+esc(d.BANK||'')+'</h2>' +
+          '<p class="sub" style="margin:0">'+esc(d.BRANCH||'')+'</p></div>' +
+        '</div>' +
         row('IFSC', d.IFSC, IC.code) +
         row('MICR', d.MICR, IC.micr) +
         row('Branch code', d.BRANCHCODE, IC.branch) +
@@ -186,6 +228,12 @@ async function search(){
           '<button id="shareBtn" class="share">'+IC.share+'Share</button>' +
         '</div>' +
       '</div>';
+    const li = $('logoImg');
+    if(li){
+      const fail = ()=>{ if(!li.dataset.g){ li.dataset.g='1'; li.src='https://www.google.com/s2/favicons?domain='+li.dataset.d+'&sz=128'; } else { li.remove(); } };
+      li.addEventListener('error', fail);
+      if(li.complete && li.naturalWidth === 0) fail();
+    }
     $('closeCard').addEventListener('click', ()=>{
       const card = $('resultCard');
       if(!card) return;
