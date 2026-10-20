@@ -1,4 +1,4 @@
-const CACHE = 'ifsc-v4';
+const CACHE = 'ifsc-v5';
 const SHELL = ['./', './index.html', './manifest.json', './icon.svg', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -10,8 +10,8 @@ self.addEventListener('activate', e => {
 });
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-  // IFSC API: network only (live data)
-  if (url.origin === 'https://ifsc.razorpay.com') return;
+  // only handle our own files; APIs and bank logos go straight to network
+  if (url.origin !== location.origin) return;
   e.respondWith(
     caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {
       const copy = res.clone();
