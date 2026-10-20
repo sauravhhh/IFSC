@@ -24,14 +24,12 @@
   body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
     background:var(--bg); color:var(--txt);}
   #app{max-width:560px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) 16px 40px;}
-  header{text-align:center;padding:14px 0 6px;}
-  header img{width:72px;height:72px;border-radius:18px;}
-  header h1{font-size:26px;margin:12px 0 4px;font-weight:700;letter-spacing:-.4px;}
-  header p{margin:0;color:var(--mut);font-size:14px;}
-  .field{margin:22px 0 0;position:relative;}
-  .field input{width:100%;padding:15px 48px 15px 16px;font-size:18px;font-weight:600;letter-spacing:1.5px;
+  .field{margin:10px 0 0;position:relative;}
+  .field input{width:100%;padding:15px 48px 15px 16px;font-size:17px;font-weight:600;letter-spacing:1.2px;
     text-transform:uppercase;border:1px solid var(--sep);border-radius:14px;
-    background:var(--card);color:var(--txt);outline:none;text-align:center;}
+    background:var(--card);color:var(--txt);outline:none;text-align:left;
+    transition:border-color .15s ease, box-shadow .15s ease;}
+  .field input:focus{border-color:var(--acc);box-shadow:0 0 0 4px rgba(10,88,214,.15);}
   .clearIn{position:absolute;right:10px;top:50%;transform:translateY(-50%) scale(.6);width:28px;height:28px;
     border-radius:50%;border:none;background:var(--inp);color:var(--mut);font-size:13px;line-height:1;
     cursor:pointer;display:flex;align-items:center;justify-content:center;
@@ -65,7 +63,6 @@
   .row .k{color:var(--mut);flex-shrink:0;display:flex;align-items:center;gap:7px;}
   .row .k svg{width:15px;height:15px;flex-shrink:0;}
   .btn svg, .actions button svg{width:16px;height:16px;vertical-align:-3px;margin-right:6px;}
-  .field .searchIc{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--mut);pointer-events:none;}
   .row .v{text-align:right;font-weight:500;word-break:break-word;}
   .actions{display:flex;gap:10px;margin-top:16px;}
   .actions button{flex:1;padding:13px;font-size:14px;font-weight:600;border-radius:12px;cursor:pointer;
@@ -89,14 +86,7 @@
 </head>
 <body>
 <div id="app">
-  <header>
-    <img src="icon-192.png" alt="IFSC logo">
-    <h1>IFSC</h1>
-    <p>Find bank branch details by IFSC code</p>
-  </header>
-
   <div class="field">
-    <svg class="searchIc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
     <input id="q" maxlength="11" placeholder="Enter IFSC code, e.g. SBIN0000001"
       autocomplete="off" autocapitalize="characters" spellcheck="false">
     <button class="clearIn" id="clearInput" aria-label="Clear">✕</button>
